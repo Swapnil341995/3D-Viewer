@@ -2,17 +2,13 @@ let viewer = new Viewer();
 
 const app = {
   identityMatrix: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+  raycastObject: undefined,
   verticesCount: null,
   trianglesCount: null,
   transformControls: null,
   partNames: [],
   moveWings: false,
-  createCube: function (
-    length = 10,
-    width = 10,
-    height = 10,
-    color = 0x0000ff
-  ) {
+  createCube: function (length = 10,width = 10,height = 10,color = 0x0000ff) {
     const geometry = new THREE.BoxGeometry(length, width, height);
     const material = new THREE.MeshBasicMaterial({ color: color });
     const cube = new THREE.Mesh(geometry, material);
@@ -141,10 +137,10 @@ const app = {
     loader.load(
       // resource URL
       // "./assets/gltf/scifi-helmet/SciFiHelmet.gltf",
-      // "./assets/glb/BrainStem.glb",
+      "./assets/glb/BrainStem.glb",
       // "./assets/glb/FormalShoe.glb",
       // "./assets/gltf/toycar/ToyCar.gltf",
-      "./assets/gltf/duck/Duck.glb",
+      // "./assets/gltf/duck/Duck.glb",
       // called when the resource is loaded
       function (gltf) {
         viewer.sceneObject.add(gltf.scene);
@@ -374,27 +370,78 @@ const app = {
   },
 
   highlightPart: function (partName) {
-    const highlightObject = viewer.sceneObject.getObjectByName(partName);
-    highlightObject.material.userdata = {};
-    highlightObject.material.userdata.color =
-      highlightObject.material.color.clone();
-    highlightObject.material.color = new THREE.Color(0xff007f);
+    if(partName){
+      const highlightObject = viewer.sceneObject.getObjectByName(partName);
+      if(!highlightObject.material.userdata){
+        highlightObject.material.userdata = {};
+        highlightObject.material.userdata.color = highlightObject.material.color.clone();
+        highlightObject.material.color = new THREE.Color(0xff007f).clone();
+      }
+    }
   },
 
   removeHighlight: function (partName) {
-    const highlightObject = viewer.sceneObject.getObjectByName(partName);
-    // highlightObject.material.userdata = {};
-    // highlightObject.material.userdata.color = highlightObject.material.color.clone();
-    highlightObject.material.color = new THREE.Color(
-      highlightObject.material.userdata?.color
-    );
+    if(partName){
+      const highlightObject = viewer.sceneObject.getObjectByName(partName);
+      highlightObject.material.color = new THREE.Color(
+        highlightObject.material.userdata?.color
+      );
+      highlightObject.material.userdata = undefined;
+    }
   },
 
-  getObjectFromRaycaster: function () {
-    
+  addHighlightToObject: function (id) {
+    if(id !== undefined){
+      const highlightObject = viewer.sceneObject.getObjectById(id);
+      if(highlightObject && !highlightObject.material.userdata){
+        highlightObject.material.userdata = {}
+        highlightObject.material.userdata.color = highlightObject.material.color.clone();
+        highlightObject.material.color = new THREE.Color(0xff007f).clone();
+        app.raycastObject = highlightObject;
+      }
+    }
+  },
+
+  removeHighlightFromObject: function (id) {
+    if(id === undefined && app.raycastObject !== undefined){
+      const highlightObject = viewer.sceneObject.getObjectById(app.raycastObject.id);
+      highlightObject.material.color = new THREE.Color(
+        highlightObject.material.userdata?.color
+        );
+      highlightObject.material.userdata = undefined;
+      app.raycastObject === undefined;
+    }
+    if(id !== undefined && app.raycastObject !== undefined && id !== app.raycastObject.id){
+      const highlightObject = viewer.sceneObject.getObjectById(app.raycastObject.id);
+      highlightObject.material.color = new THREE.Color(
+        highlightObject.material.userdata?.color
+      );
+      highlightObject.material.userdata = undefined;
+      app.raycastObject === undefined;
+    }
+  },
+
+  updateObjectFromRaycaster: function () {
+    // update the picking ray with the camera and pointer position
+    viewer.rayCaster.setFromCamera(viewer.pointer, viewer.camera);
+
     // calculate objects intersecting the picking ray
-	  const intersects = viewer.rayCaster.intersectObjects( viewer.sceneObject.children );
-    console.log(intersects.length);
+	  const intersects = viewer.rayCaster.intersectObjects( viewer.sceneObject.children, true );
+    // app.raycastObject = intersects[0]?.object;
+    if(intersects[0] && intersects[0].object !== undefined){
+      app.raycastObject = intersects[0].object;
+    }
+    this.highlightObject(intersects[0]?.object);
+    viewer.renderer.render(viewer.scene, viewer.camera);
+  },
+
+  highlightObject: function(obj){
+    if(obj === undefined && app.raycastObject !== undefined){
+      app.removeHighlightFromObject(obj?.id);
+    }
+    else{
+      app.addHighlightToObject(obj?.id);
+    }
   },
 
   /**
@@ -421,32 +468,9 @@ const events = {
   onPointerMove: function (event) {
     // calculate pointer position in normalized device coordinates
     // (-1 to +1) for both components
-    // const rect = viewer.canvas.getBoundingClientRect();
-    // let x = event.clientX - rect.left;
-    // let y = event.clientY - rect.top;
-    // viewer.pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
-    // viewer.pointer.y = -(event.clientY / window.innerHeight) * 2 - 1;
-    // viewer.pointer.x = (x / viewer.canvas.clientWidth ) *  2 - 1;
-    // viewer.pointer.y = -(y / viewer.canvas.clientHeight ) *  2 - 1;
-    // app.getObjectFromRaycaster();
-
-    // calculate pointer position in normalized device coordinates
-    // (-1 to +1) for both components
-    viewer.pointer.x = ( event.clientX / viewer.canvas.width ) * 2 - 1;
-    viewer.pointer.y = - ( event.clientY / viewer.canvas.height ) * 2 + 1;
-    // viewer.pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-    // viewer.pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-    viewer.rayCaster.setFromCamera( viewer.pointer, viewer.camera );
-    viewer.orbitControls.update();
-    viewer.camera.updateProjectionMatrix();
-    // calculate objects intersecting the picking ray
-    const intersects = viewer.rayCaster.intersectObjects( viewer.sceneObject.children );
-
-    for ( let i = 0; i < intersects.length; i ++ ) {
-
-        intersects[ i ].object.material.color.set( 0xff0fff );
-
-    }
+    viewer.pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+    viewer.pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+    app.updateObjectFromRaycaster();
 
   },
 };
@@ -469,8 +493,6 @@ function animate() {
     }
     viewer.scene.children[0].geometry.attributes.position.needsUpdate = true;
   }
-  // update the picking ray with the camera and pointer position
-  viewer.rayCaster.setFromCamera(viewer.pointer, viewer.camera);
 
   viewer.renderer.render(viewer.scene, viewer.camera);
 }
