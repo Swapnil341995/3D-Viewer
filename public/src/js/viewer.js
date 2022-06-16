@@ -1,6 +1,6 @@
 class Viewer {
     constructor(){
-        this.canvas = document.createElement('canvas');
+        this.canvas = document.getElementById('id_webglCanvas');
         // this.canvas.style.borderColor = "#000000";
         this.scene = new THREE.Scene();
         this.scene.name = "root scene";
@@ -34,6 +34,8 @@ class Viewer {
 
         this.renderer = new THREE.WebGLRenderer({canvas: this.canvas});
         this.orbitControls = undefined;
+        this.rayCaster = new THREE.Raycaster();
+        this.pointer = new THREE.Vector2(); 
     }
 
     setSceneBackgroundColor(colorCode){

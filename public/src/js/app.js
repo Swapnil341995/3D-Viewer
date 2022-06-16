@@ -1,16 +1,25 @@
 let viewer = new Viewer();
 
 const app = {
+  identityMatrix: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+  verticesCount: null,
+  trianglesCount: null,
   transformControls: null,
+  partNames: [],
   moveWings: false,
-  createCube: function (length = 10, width = 10, height = 10, color = 0x0000ff) {
+  createCube: function (
+    length = 10,
+    width = 10,
+    height = 10,
+    color = 0x0000ff
+  ) {
     const geometry = new THREE.BoxGeometry(length, width, height);
     const material = new THREE.MeshBasicMaterial({ color: color });
     const cube = new THREE.Mesh(geometry, material);
     return cube;
   },
   /**
-   * @param {data} vertices 
+   * @param {data} vertices
    * @returns pos, norm, uv
    */
   prepareDataFromSamples: function (vertices) {
@@ -24,7 +33,7 @@ const app = {
     }
     return { positions, normals, uvs };
   },
-  /** creating a butterfly */ 
+  /** creating a butterfly */
   createButterfly: function () {
     //ADD this to animate
     // if(viewer.scene.children[0].geometry.attributes.position.array[7] >= 9 || viewer.scene.children[0].geometry.attributes.position.array[7] <= -3){
@@ -131,14 +140,15 @@ const app = {
     // Load a glTF and glb resource
     loader.load(
       // resource URL
-      "./assets/gltf/scifi-helmet/SciFiHelmet.gltf",
+      // "./assets/gltf/scifi-helmet/SciFiHelmet.gltf",
       // "./assets/glb/BrainStem.glb",
+      // "./assets/glb/FormalShoe.glb",
       // "./assets/gltf/toycar/ToyCar.gltf",
-      // "./assets/gltf/duck/Duck.glb",
+      "./assets/gltf/duck/Duck.glb",
       // called when the resource is loaded
       function (gltf) {
         viewer.sceneObject.add(gltf.scene);
-
+        app.afterSceneLoadComplete();
         // gltf.animations; // Array<THREE.AnimationClip>
         // gltf.scene; // THREE.Group
         // gltf.scenes; // Array<THREE.Group>
@@ -155,93 +165,115 @@ const app = {
       }
     );
   },
-  loadOBJ: function(){
+  loadOBJ: function () {
     const loader = new THREE.OBJLoader();
     loader.load(
       // './assets/obj/LibertyStatue/LibertStatue.obj',
       // './assets/obj/maya/maya.obj',
       // './assets/obj/PantherBoss/PAN.obj',
-      // './assets/obj/batman/batman.obj',
-      './assets/obj/DarkSiderGun/GUN_OBJ.obj',
-      function ( object ) {
-        viewer.sceneObject.add( object );
+      "./assets/obj/batman/batman.obj",
+      // './assets/obj/DarkSiderGun/GUN_OBJ.obj',
+      function (object) {
+        viewer.sceneObject.add(object);
+        app.afterSceneLoadComplete();
       },
       // called when loading is in progresses
-      function ( xhr ) {
-        console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+      function (xhr) {
+        console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
       },
       // called when loading has errors
-      function ( error ) {
-        console.log( 'An error happened' );
+      function (error) {
+        console.log("An error happened");
       }
-    )
+    );
   },
-  addAmbientLight: function(intensity = 0.5){
-    const light = new THREE.AmbientLight( 0x404040 );
+  addAmbientLight: function (intensity = 0.5) {
+    const light = new THREE.AmbientLight(0x404040);
     light.intensity = intensity;
-    viewer.scene.add( light );
+    viewer.scene.add(light);
   },
-  addSpotLight: function(){
-    const light = new THREE.SpotLight( 0x404040 );
-    light.intensity = 3;
-    // light.target = viewer.scene.position;
-    // light.position.x = 60;
-    // light.position.y = 60;
-    // light.position.z = 60;
-    return light
+  addSpotLight: function () {
+    const light = new THREE.SpotLight(0x404040);
+    light.intensity = 2;
+    return light;
   },
-  addSpotLightInCamera: function(){
+  addSpotLightInCamera: function () {
     const spotLight = this.addSpotLight();
     spotLight.position.set(0, 0, 1);
     spotLight.target = viewer.camera;
     viewer.camera.add(spotLight);
     viewer.camera.updateProjectionMatrix();
   },
-  displayBoundingBox: function(){
-    const box = new THREE.BoxHelper( viewer.sceneObject, 0x66FF33 );
-    viewer.scene.add(box);
+  showOrHideBoundingBox: function (boolBbox) {
+    let box;
+    if (boolBbox) {
+      box = new THREE.BoxHelper(viewer.sceneObject, 0x66ff33);
+      box.name = "bboxHelper";
+      viewer.scene.add(box);
+    } else {
+      const box = viewer.scene.getObjectByName("bboxHelper");
+      viewer.scene.remove(box);
+    }
   },
   /**
-   * 
-   * @param {3d object or mesh or group} object 
+   *
+   * @param {3d object or mesh or group} object
    * @returns proper bounding box
    */
-  getProperBbox: function(object){
+  getProperBbox: function (object) {
     let bbox = new THREE.Box3();
-    object.traverse(function(obj){
-      if(obj instanceof THREE.Mesh){
+    object.traverse(function (obj) {
+      if (obj instanceof THREE.Mesh) {
         obj.geometry.computeBoundingBox();
-        bbox.max.x = obj.geometry.boundingBox.max.x > bbox.max.x ? obj.geometry.boundingBox.max.x : bbox.max.x;
-        bbox.max.y = obj.geometry.boundingBox.max.y > bbox.max.y ? obj.geometry.boundingBox.max.y : bbox.max.y;
-        bbox.max.z = obj.geometry.boundingBox.max.z > bbox.max.z ? obj.geometry.boundingBox.max.z : bbox.max.z;
-        
-        bbox.min.x = obj.geometry.boundingBox.min.x < bbox.min.x ? obj.geometry.boundingBox.min.x : bbox.min.x;
-        bbox.min.y = obj.geometry.boundingBox.min.y < bbox.min.y ? obj.geometry.boundingBox.min.y : bbox.min.y;
-        bbox.min.z = obj.geometry.boundingBox.min.z < bbox.min.z ? obj.geometry.boundingBox.min.z : bbox.min.z;
+        bbox.max.x =
+          obj.geometry.boundingBox.max.x > bbox.max.x
+            ? obj.geometry.boundingBox.max.x
+            : bbox.max.x;
+        bbox.max.y =
+          obj.geometry.boundingBox.max.y > bbox.max.y
+            ? obj.geometry.boundingBox.max.y
+            : bbox.max.y;
+        bbox.max.z =
+          obj.geometry.boundingBox.max.z > bbox.max.z
+            ? obj.geometry.boundingBox.max.z
+            : bbox.max.z;
+
+        bbox.min.x =
+          obj.geometry.boundingBox.min.x < bbox.min.x
+            ? obj.geometry.boundingBox.min.x
+            : bbox.min.x;
+        bbox.min.y =
+          obj.geometry.boundingBox.min.y < bbox.min.y
+            ? obj.geometry.boundingBox.min.y
+            : bbox.min.y;
+        bbox.min.z =
+          obj.geometry.boundingBox.min.z < bbox.min.z
+            ? obj.geometry.boundingBox.min.z
+            : bbox.min.z;
       }
     });
-    return bbox
+    return bbox;
   },
-  getDimensions: function(){
+  getDimensions: function () {
     let bbox = this.getProperBbox(viewer.sceneObject);
-    let dim_x = bbox.max.x - bbox.min.x; 
-    let dim_y = bbox.max.y - bbox.min.y; 
+    let dim_x = bbox.max.x - bbox.min.x;
+    let dim_y = bbox.max.y - bbox.min.y;
     let dim_z = bbox.max.z - bbox.min.z;
-    return { dim_x, dim_y, dim_z }; 
+    return { dim_x, dim_y, dim_z };
   },
-  alignCameraWithBbox: function(){
+  alignCameraWithBbox: function () {
     const bbox = this.getProperBbox(viewer.sceneObject);
     // const vect = new THREE.Vector3();
     // bbox.getCenter(vect);
-    let x = bbox.min.x + (bbox.max.x - bbox.min.x)/2;
-    let y = bbox.min.y + (bbox.max.y - bbox.min.y)/2;
-    let z = bbox.min.z + (bbox.max.z - bbox.min.z)/2;
-    viewer.movePerspectiveCamera(x , y - (y * 0.9) , z - (z * 2) );
+    let x = bbox.min.x + (bbox.max.x - bbox.min.x) / 2;
+    let y = bbox.min.y + (bbox.max.y - bbox.min.y) / 2;
+    let z = bbox.min.z + (bbox.max.z - bbox.min.z) / 2;
+    viewer.movePerspectiveCamera(x, y - y * 0.9, z - z * 2);
     viewer.camera.lookAt(viewer.sceneObject);
     viewer.camera.updateProjectionMatrix();
   },
-  setPerspectiveCameraZoomLimit: function(){
-    if(viewer.sceneObject){
+  setPerspectiveCameraZoomLimit: function () {
+    if (viewer.sceneObject) {
       let boundingBox = new THREE.Box3().setFromObject(viewer.sceneObject);
       // let boundingBox = viewer.sceneObject.getBoundingBox();
       let minDist = viewer.camera.position.distanceTo(boundingBox.min);
@@ -254,20 +286,126 @@ const app = {
   },
   getBoundingBoxCenter: function () {
     let bbox = new THREE.Box3().setFromObject(viewer.sceneObject);
-    let bboxMaxCenter = new THREE.Vector3((bbox.max.x + bbox.min.x)/2, (bbox.max.y + bbox.min.y)/2, (bbox.max.z + bbox.min.z)/2);
+    let bboxMaxCenter = new THREE.Vector3(
+      (bbox.max.x + bbox.min.x) / 2,
+      (bbox.max.y + bbox.min.y) / 2,
+      (bbox.max.z + bbox.min.z) / 2
+    );
     return bboxMaxCenter;
   },
-  updateOrbitControlsTarget: function(){
-    viewer.orbitControls.target = this.getBoundingBoxCenter()
+  updateOrbitControlsTarget: function () {
+    viewer.orbitControls.target = this.getBoundingBoxCenter();
   },
-  addTransformControls: function(){
-    app.transformControls = new THREE.TransformControls(viewer.camera, viewer.renderer.domElement);
+  addTransformControls: function () {
+    app.transformControls = new THREE.TransformControls(
+      viewer.camera,
+      viewer.renderer.domElement
+    );
     app.transformControls.attach(viewer.sceneObject);
     viewer.scene.add(app.transformControls);
   },
-  removeTransformControls: function(){
+  removeTransformControls: function () {
     app.transformControls.detach();
-  }
+  },
+
+  homePosition: function () {
+    //calculate bounding box of the scene object
+    const bbox = new THREE.Box3().setFromObject(viewer.sceneObject);
+    // //get the orbit controls target in the bounding box center
+    this.updateOrbitControlsTarget();
+    //generate matrix4 from the identity array
+    const mat = new THREE.Matrix4().fromArray(app.identityMatrix);
+    const inverse = new THREE.Matrix4();
+    //get inverse of the matrix
+    inverse.copy(mat).invert();
+    const quaternion = new THREE.Quaternion();
+    const position = new THREE.Vector3();
+    const scale = new THREE.Vector3();
+    //get pos, quat and scale from the matrix
+    inverse.decompose(position, quaternion, scale);
+    //set camera position to home
+    viewer.camera.position.set(
+      position.x,
+      position.y + bbox.max.y * 3,
+      bbox.max.z + bbox.max.z * 10
+    );
+  },
+
+  getVerticesAndTrianglesCount: function () {
+    (app.verticesCount = 0), (app.trianglesCount = 0);
+    viewer.sceneObject.traverse((object) => {
+      if (object.isMesh) {
+        const geometry = object.geometry;
+        app.verticesCount += geometry.attributes.position.count;
+        if (geometry.index !== null) {
+          app.trianglesCount += geometry.index.count / 3;
+        } else {
+          app.trianglesCount += geometry.attributes.position.count / 3;
+        }
+      }
+    });
+  },
+
+  /**
+   * Turns model into wireframe mode
+   */
+  turnModelToWireframe: function (boolWireframe) {
+    if (boolWireframe) {
+      viewer.sceneObject.traverse((obj) => {
+        if (obj.isMesh) {
+          obj.material.wireframe = true;
+        }
+      });
+    } else {
+      viewer.sceneObject.traverse((obj) => {
+        if (obj.isMesh) {
+          obj.material.wireframe = false;
+        }
+      });
+    }
+  },
+
+  getPartNames: function () {
+    viewer.sceneObject.traverse((obj) => {
+      if (obj.isMesh) {
+        this.partNames.push(obj.name);
+      }
+    });
+  },
+
+  highlightPart: function (partName) {
+    const highlightObject = viewer.sceneObject.getObjectByName(partName);
+    highlightObject.material.userdata = {};
+    highlightObject.material.userdata.color =
+      highlightObject.material.color.clone();
+    highlightObject.material.color = new THREE.Color(0xff007f);
+  },
+
+  removeHighlight: function (partName) {
+    const highlightObject = viewer.sceneObject.getObjectByName(partName);
+    // highlightObject.material.userdata = {};
+    // highlightObject.material.userdata.color = highlightObject.material.color.clone();
+    highlightObject.material.color = new THREE.Color(
+      highlightObject.material.userdata?.color
+    );
+  },
+
+  getObjectFromRaycaster: function () {
+    
+    // calculate objects intersecting the picking ray
+	  const intersects = viewer.rayCaster.intersectObjects( viewer.sceneObject.children );
+    console.log(intersects.length);
+  },
+
+  /**
+   * After completing the model or scene
+   */
+  afterSceneLoadComplete: function () {
+    app.homePosition();
+    app.getVerticesAndTrianglesCount();
+    app.getPartNames();
+    window.addEventListener("mousemove", events.onPointerMove, false); //for raycaster
+  },
 };
 
 const events = {
@@ -277,6 +415,39 @@ const events = {
     viewer.camera.aspect = width / height;
     viewer.renderer.setSize(width, height);
     viewer.camera.updateProjectionMatrix();
+  },
+
+  //gets pointer or cursor position, useful for raycasting
+  onPointerMove: function (event) {
+    // calculate pointer position in normalized device coordinates
+    // (-1 to +1) for both components
+    // const rect = viewer.canvas.getBoundingClientRect();
+    // let x = event.clientX - rect.left;
+    // let y = event.clientY - rect.top;
+    // viewer.pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+    // viewer.pointer.y = -(event.clientY / window.innerHeight) * 2 - 1;
+    // viewer.pointer.x = (x / viewer.canvas.clientWidth ) *  2 - 1;
+    // viewer.pointer.y = -(y / viewer.canvas.clientHeight ) *  2 - 1;
+    // app.getObjectFromRaycaster();
+
+    // calculate pointer position in normalized device coordinates
+    // (-1 to +1) for both components
+    viewer.pointer.x = ( event.clientX / viewer.canvas.width ) * 2 - 1;
+    viewer.pointer.y = - ( event.clientY / viewer.canvas.height ) * 2 + 1;
+    // viewer.pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+    // viewer.pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+    viewer.rayCaster.setFromCamera( viewer.pointer, viewer.camera );
+    viewer.orbitControls.update();
+    viewer.camera.updateProjectionMatrix();
+    // calculate objects intersecting the picking ray
+    const intersects = viewer.rayCaster.intersectObjects( viewer.sceneObject.children );
+
+    for ( let i = 0; i < intersects.length; i ++ ) {
+
+        intersects[ i ].object.material.color.set( 0xff0fff );
+
+    }
+
   },
 };
 
@@ -298,6 +469,8 @@ function animate() {
     }
     viewer.scene.children[0].geometry.attributes.position.needsUpdate = true;
   }
+  // update the picking ray with the camera and pointer position
+  viewer.rayCaster.setFromCamera(viewer.pointer, viewer.camera);
 
   viewer.renderer.render(viewer.scene, viewer.camera);
 }

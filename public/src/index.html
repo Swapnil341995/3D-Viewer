@@ -4,7 +4,51 @@
     <title>Document</title>
     <link rel="stylesheet" href="./css/viewer.css">
 </head>
-<body>
+<body>   
+    <div id="id_divWebglCanvas">
+        <canvas id="id_webglCanvas"></canvas>
+    </div>
+
+    <!-- top heading features -->
+    <div id="id_topFeatures">
+        <img id="id_leftHamburger" src="./assets/icons/hamburger.png" alt="side bar">
+        <img id="id_rightHamburger" src="./assets/icons/hamburger.png" alt="side bar">
+    </div>  
+    
+    <!-- left bar -->
+    <div id="id_UIleft" class="class_UI" class="container">
+        <div id="id_divModelTreeName" style="color: black; position: relative;left: 28%;">
+            <div><p><b>MODEL TREE</b></p></div>
+        </div>
+        <div id="id_divModelTree">
+        </div>
+    </div> 
+    
+    <!-- right bar -->
+    <div id="id_UIright" class="class_UI">
+        <div id="id_divFeatures" style="color: black; position: relative;left: 32%;">
+            <p><b>FEATURES</b></p>  
+        </div>
+        <div id="id_rightFeatures">
+            <div id="id_divWireframe" >
+                <input type="checkbox" id="inp_chkboxWireframe"> <p> : Wireframe</p>
+            </div>
+            <div id="id_divTransCont">
+                <input type="checkbox" id="inp_chkTransCont"> <p> : Transform Controls</p>
+            </div>
+            <div id="id_divBbox">
+                <input type="checkbox" id="inp_chkBbox"> <p> : Bounding Box</p>
+            </div>
+        </div>
+    </div> 
+
+    <!-- bottom footer  -->
+    <div id="id_bottomFeatures">
+        <div id="id_divHome">
+            <img id="id_imgHome" src="./assets/icons/home.png" alt="home">
+        </div>
+    </div>  
+
     <script src="./js/three.min.js"></script>
     <script src="./js/GLTFLoader.js"></script>
     <script src="./js/OBJLoader.js"></script>
@@ -14,5 +58,7 @@
     <script src="./js/OrbitControls.js"></script>
     <script src="./js/sample-geometry.js"></script>
     <script src="./js/inputs.js"></script>
+    <script src="./js/ui.js"></script>
+        
 </body>
 </html>
