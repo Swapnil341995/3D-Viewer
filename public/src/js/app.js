@@ -138,9 +138,9 @@ const app = {
     loader.load(
       // resource URL
       // "./assets/gltf/scifi-helmet/SciFiHelmet.gltf",
-      // "./assets/glb/BrainStem.glb",
+      "./assets/glb/BrainStem.glb",
       // "./assets/glb/FormalShoe.glb",
-      "./assets/gltf/toycar/ToyCar.gltf",
+      // "./assets/gltf/toycar/ToyCar.gltf",
       // "./assets/gltf/duck/Duck.glb",
       // "./assets/gltf/boom-box-with-axes/BoomBoxWithAxes.gltf",
       // called when the resource is loaded
