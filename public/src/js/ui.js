@@ -11,11 +11,14 @@ const leftBar = document.getElementById("id_UIleft");
 const chkBoxWireframe = document.getElementById("inp_chkboxWireframe");
 const chkBoxTransformCont = document.getElementById("inp_chkTransCont");
 const chkBoxBbox = document.getElementById("inp_chkBbox");
+const ambLight = document.getElementById("inp_ambLight");
+const highlightObjects = document.getElementById("inp_highlightObject");
 
 function fillModelTree(){
     const divModelPart = document.getElementById("id_divModelTree");
     app.partNames.forEach(element => {
         const divElement = document.createElement("div");
+        divElement.id = "divId_" + element;
         const paraElement = document.createElement("p");
         paraElement.style.cursor = "pointer";
         paraElement.textContent = element;
@@ -34,6 +37,32 @@ function fillModelTree(){
     });
 } 
 
+function highlightModelName(id) {
+    const highlightObject = viewer.sceneObject.getObjectById(id);
+    const divId = "divId_" + highlightObject.name;
+    const element = document.getElementById(divId);
+    // console.log(element);
+    element.style.backgroundColor = "white";
+    element.childNodes[0].style.color = "black";
+}
+
+function removeHighlightNameFromModelTree(id) {
+    const highlightObject = viewer.sceneObject.getObjectById(id);
+    const divId = "divId_" + highlightObject.name;
+    const element = document.getElementById(divId);
+    // console.log(element);
+    element.style.backgroundColor = "black";
+    element.childNodes[0].style.color = "white";
+}
+
+highlightObjects.onclick = function(){
+    if(highlightObjects.checked){
+        app.addEventListenerForHighlightObject();
+    }else{
+        app.removeEventListenerForHighlightObject();
+    }
+}
+
 chkBoxBbox.onclick = function(){
     app.showOrHideBoundingBox(chkBoxBbox.checked);
 }
@@ -50,11 +79,16 @@ chkBoxWireframe.onclick = function(){
     app.turnModelToWireframe(chkBoxWireframe.checked);
 }
 
+ambLight.oninput = function(){
+    const ambientLight = viewer.scene.getObjectByName("ambient_light");
+    ambientLight.intensity = ambLight.value;
+}
+
 leftHam.onclick = function() {
     const leftBar = document.getElementById("id_UIleft");
     if(UIconstants.leftHam){
         leftHam.src = "./assets/icons/close.png";
-        UIconstants.leftHam = false;
+        UIconstants.leftHam = !UIconstants.leftHam;
         leftBar.style.width = "18%";
         if(UIconstants.leftDisplay){
             addVerticesAndTriangleCount();
@@ -63,7 +97,7 @@ leftHam.onclick = function() {
         }
     }else{
         leftHam.src = "./assets/icons/hamburger.png";
-        UIconstants.leftHam = true;
+        UIconstants.leftHam = !UIconstants.leftHam;
         leftBar.style.width = "0%";
     }
 }

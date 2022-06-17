@@ -10,7 +10,7 @@ viewer.scene.add(viewer.camera);
 // viewer.sceneObject.add(app.createCube());
 // app.loadOBJ();
 app.loadGltf();
-app.addAmbientLight(1);
+app.addOrUpdateAmbientLight(1);
 app.addSpotLightInCamera();
 // app.displayBoundingBox();
 // viewer.scene.add(viewer.sceneObject.add(app.createCube(50, 8, 2, 0xffbf00)));

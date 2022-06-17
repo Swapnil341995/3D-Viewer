@@ -6,6 +6,7 @@ const app = {
   verticesCount: null,
   trianglesCount: null,
   transformControls: null,
+  INTERSECTED: null,
   partNames: [],
   moveWings: false,
   createCube: function (length = 10,width = 10,height = 10,color = 0x0000ff) {
@@ -137,10 +138,11 @@ const app = {
     loader.load(
       // resource URL
       // "./assets/gltf/scifi-helmet/SciFiHelmet.gltf",
-      "./assets/glb/BrainStem.glb",
+      // "./assets/glb/BrainStem.glb",
       // "./assets/glb/FormalShoe.glb",
-      // "./assets/gltf/toycar/ToyCar.gltf",
+      "./assets/gltf/toycar/ToyCar.gltf",
       // "./assets/gltf/duck/Duck.glb",
+      // "./assets/gltf/boom-box-with-axes/BoomBoxWithAxes.gltf",
       // called when the resource is loaded
       function (gltf) {
         viewer.sceneObject.add(gltf.scene);
@@ -183,10 +185,17 @@ const app = {
       }
     );
   },
-  addAmbientLight: function (intensity = 0.5) {
-    const light = new THREE.AmbientLight(0x404040);
-    light.intensity = intensity;
-    viewer.scene.add(light);
+  addOrUpdateAmbientLight: function (intensity = 0.5) {
+    const ambLight = viewer.scene.getObjectByName("ambient_light");
+    if(ambLight === undefined){
+      const light = new THREE.AmbientLight(0x404040);
+      light.name = "ambient_light";
+      light.intensity = intensity;
+      viewer.scene.add(light);
+    }
+    else{
+      ambLight.intensity = intensity;
+    }
   },
   addSpotLight: function () {
     const light = new THREE.SpotLight(0x404040);
@@ -391,57 +400,63 @@ const app = {
   },
 
   addHighlightToObject: function (id) {
-    if(id !== undefined){
-      const highlightObject = viewer.sceneObject.getObjectById(id);
-      if(highlightObject && !highlightObject.material.userdata){
-        highlightObject.material.userdata = {}
-        highlightObject.material.userdata.color = highlightObject.material.color.clone();
-        highlightObject.material.color = new THREE.Color(0xff007f).clone();
-        app.raycastObject = highlightObject;
-      }
-    }
+    
   },
 
   removeHighlightFromObject: function (id) {
-    if(id === undefined && app.raycastObject !== undefined){
-      const highlightObject = viewer.sceneObject.getObjectById(app.raycastObject.id);
-      highlightObject.material.color = new THREE.Color(
-        highlightObject.material.userdata?.color
-        );
-      highlightObject.material.userdata = undefined;
-      app.raycastObject === undefined;
-    }
-    if(id !== undefined && app.raycastObject !== undefined && id !== app.raycastObject.id){
-      const highlightObject = viewer.sceneObject.getObjectById(app.raycastObject.id);
-      highlightObject.material.color = new THREE.Color(
-        highlightObject.material.userdata?.color
-      );
-      highlightObject.material.userdata = undefined;
-      app.raycastObject === undefined;
-    }
+    
   },
 
-  updateObjectFromRaycaster: function () {
+  highlightObjectFromRaycaster: function () {
     // update the picking ray with the camera and pointer position
     viewer.rayCaster.setFromCamera(viewer.pointer, viewer.camera);
 
     // calculate objects intersecting the picking ray
 	  const intersects = viewer.rayCaster.intersectObjects( viewer.sceneObject.children, true );
-    // app.raycastObject = intersects[0]?.object;
-    if(intersects[0] && intersects[0].object !== undefined){
-      app.raycastObject = intersects[0].object;
+    
+    if ( intersects.length > 0 ) {
+
+      if ( app.INTERSECTED != intersects[ 0 ].object ) {
+
+        if ( app.INTERSECTED ){
+          app.INTERSECTED.material.emissive.setHex( app.INTERSECTED.currentHex );
+          if(!UIconstants.leftDisplay){
+            removeHighlightNameFromModelTree(app.INTERSECTED.id);
+          }
+        } 
+
+        app.INTERSECTED = intersects[ 0 ].object;
+        app.INTERSECTED.currentHex = app.INTERSECTED.material.emissive.getHex();
+        app.INTERSECTED.material.emissive.setHex( 0x00FFFF );
+
+        if(!UIconstants.leftDisplay){
+          highlightModelName(app.INTERSECTED.id);
+        }
+      }
+
+    } else {
+
+      if ( app.INTERSECTED ) app.INTERSECTED.material.emissive.setHex( app.INTERSECTED.currentHex );
+
+      if(!UIconstants.leftDisplay && app.INTERSECTED){
+        removeHighlightNameFromModelTree(app.INTERSECTED.id);
+      }
+      app.INTERSECTED = null;
+
     }
-    this.highlightObject(intersects[0]?.object);
+
     viewer.renderer.render(viewer.scene, viewer.camera);
   },
 
   highlightObject: function(obj){
-    if(obj === undefined && app.raycastObject !== undefined){
-      app.removeHighlightFromObject(obj?.id);
-    }
-    else{
-      app.addHighlightToObject(obj?.id);
-    }
+    this.addHighlightToObject(obj.id);
+  },
+
+  addEventListenerForHighlightObject: function(){
+    window.addEventListener("mousemove", events.onPointerMove, false); //for raycaster
+  },
+  removeEventListenerForHighlightObject: function(){
+    window.removeEventListener("mousemove", events.onPointerMove, false); //for raycaster
   },
 
   /**
@@ -451,7 +466,6 @@ const app = {
     app.homePosition();
     app.getVerticesAndTrianglesCount();
     app.getPartNames();
-    window.addEventListener("mousemove", events.onPointerMove, false); //for raycaster
   },
 };
 
@@ -470,7 +484,7 @@ const events = {
     // (-1 to +1) for both components
     viewer.pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
     viewer.pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-    app.updateObjectFromRaycaster();
+    app.highlightObjectFromRaycaster();
 
   },
 };

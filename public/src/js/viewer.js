@@ -13,7 +13,7 @@ class Viewer {
         //for perspective camera
         this.fov = 45;
         this.aspect = this.width/this.height;
-        this.near = 0.1;
+        this.near = 0.001;
         this.far = 20000;
         this.camera = new THREE.PerspectiveCamera(
             this.fov,
