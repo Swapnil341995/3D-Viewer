@@ -87,7 +87,7 @@ ambLight.oninput = function(){
 leftHam.onclick = function() {
     const leftBar = document.getElementById("id_UIleft");
     if(UIconstants.leftHam){
-        leftHam.src = "./assets/icons/close.png";
+        leftHam.src = "./src/assets/icons/close.png";
         UIconstants.leftHam = !UIconstants.leftHam;
         leftBar.style.width = "18%";
         if(UIconstants.leftDisplay){
@@ -96,7 +96,7 @@ leftHam.onclick = function() {
             UIconstants.leftDisplay = !UIconstants.leftDisplay;
         }
     }else{
-        leftHam.src = "./assets/icons/hamburger.png";
+        leftHam.src = "./src/assets/icons/hamburger.png";
         UIconstants.leftHam = !UIconstants.leftHam;
         leftBar.style.width = "0%";
     }
@@ -105,11 +105,11 @@ leftHam.onclick = function() {
 rightHam.onclick = function() {
     const rightBar = document.getElementById("id_UIright");
     if(UIconstants.rightHam){
-        rightHam.src = "./assets/icons/close.png";
+        rightHam.src = "./src/assets/icons/close.png";
         UIconstants.rightHam = false;
         rightBar.style.width = "18%";
     }else{
-        rightHam.src = "./assets/icons/hamburger.png";
+        rightHam.src = "./src/assets/icons/hamburger.png";
         UIconstants.rightHam = true;
         rightBar.style.width = "0%";
     }
