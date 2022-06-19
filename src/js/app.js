@@ -399,19 +399,5 @@ function animate() {
   if (viewer.orbitControls) {
     viewer.orbitControls.update();
   }
-  if (app.moveWings) {
-    if (
-      viewer.scene.children[0].geometry.attributes.position.array[7] >= 9 ||
-      viewer.scene.children[0].geometry.attributes.position.array[7] <= -3
-    ) {
-      viewer.scene.children[0].geometry.attributes.position.array[7] *= 0.05;
-      viewer.scene.children[0].geometry.attributes.position.array[10] *= 0.05;
-    } else {
-      viewer.scene.children[0].geometry.attributes.position.array[7] += 1;
-      viewer.scene.children[0].geometry.attributes.position.array[10] += 1;
-    }
-    viewer.scene.children[0].geometry.attributes.position.needsUpdate = true;
-  }
-
   viewer.renderer.render(viewer.scene, viewer.camera);
 }
