@@ -15,88 +15,6 @@ const app = {
     const cube = new THREE.Mesh(geometry, material);
     return cube;
   },
-  /**
-   * @param {data} vertices
-   * @returns pos, norm, uv
-   */
-  prepareDataFromSamples: function (vertices) {
-    const positions = [];
-    const normals = [];
-    const uvs = [];
-    for (const vertex of vertices) {
-      positions.push(...vertex.pos);
-      normals.push(...vertex.norm);
-      uvs.push(...vertex.uv);
-    }
-    return { positions, normals, uvs };
-  },
-  /** creating a butterfly */
-  createButterfly: function () {
-    //ADD this to animate
-    // if(viewer.scene.children[0].geometry.attributes.position.array[7] >= 9 || viewer.scene.children[0].geometry.attributes.position.array[7] <= -3){
-    //     viewer.scene.children[0].geometry.attributes.position.array[7] *= 0.05;
-    //     viewer.scene.children[0].geometry.attributes.position.array[10] *= 0.05;
-    // }
-    // else{
-    //     viewer.scene.children[0].geometry.attributes.position.array[7] +=1;
-    //     viewer.scene.children[0].geometry.attributes.position.array[10] +=1;
-    // }
-    // viewer.scene.children[0].geometry.attributes.position.needsUpdate = true
-    this.moveWings = true;
-    const geometry = new THREE.BufferGeometry();
-    const positionNumComponents = 3;
-    const positions = [];
-    for (const vertex of sample.butterflyVertices) {
-      positions.push(...vertex.pos);
-    }
-    geometry.setAttribute(
-      "position",
-      new THREE.BufferAttribute(
-        new Float32Array(positions),
-        positionNumComponents
-      )
-    );
-    geometry.setIndex([0, 1, 2, 0, 1, 3]);
-    const materialProperties = this.addDefaultMaterialProperties();
-    const material = new THREE.MeshBasicMaterial(materialProperties);
-    const mesh = new THREE.Mesh(geometry, material);
-    return mesh;
-  },
-  //Created from sample-geometry
-  createCustomGeometryFromSample: function (vertices) {
-    const { positions, normals, uvs } = this.prepareDataFromSamples(vertices);
-    const geometry = new THREE.BufferGeometry();
-    const positionNumComponents = 3;
-    const normalNumComponents = 3;
-    const uvNumComponents = 2;
-    geometry.setAttribute(
-      "position",
-      new THREE.BufferAttribute(
-        new Float32Array(positions),
-        positionNumComponents
-      )
-    );
-    geometry.setAttribute(
-      "normal",
-      new THREE.BufferAttribute(new Float32Array(normals), normalNumComponents)
-    );
-    geometry.setAttribute(
-      "uv",
-      new THREE.BufferAttribute(new Float32Array(uvs), uvNumComponents)
-    );
-    geometry.setIndex([
-      0, 1, 2, 2, 1, 3, 4, 5, 6, 6, 5, 7, 8, 9, 10, 10, 9, 11, 12, 13, 14, 14,
-      13, 15, 16, 17, 18, 18, 17, 19, 20, 21, 22, 22, 21, 23,
-    ]);
-    return geometry;
-  },
-  createMeshFromGeometry: function (vertices) {
-    const geometry = this.createCustomGeometryFromSample(vertices);
-    const materialProperties = this.addDefaultMaterialProperties();
-    const material = new THREE.MeshBasicMaterial(materialProperties);
-    const mesh = new THREE.Mesh(geometry, material);
-    return mesh;
-  },
   addOrbitControls: function () {
     viewer.orbitControls = new THREE.OrbitControls(
       viewer.camera,
@@ -125,20 +43,13 @@ const app = {
     mesh.position.y = objPositions.y;
     mesh.position.z = objPositions.z;
   },
-  toggleMovementOfWings: function () {
-    if (this.moveWings) {
-      this.moveWings = false;
-    } else {
-      this.moveWings = true;
-    }
-  },
   loadGltf: function () {
     const loader = new THREE.GLTFLoader();
     // Load a glTF and glb resource
     loader.load(
       // resource URL
-      // "./assets/gltf/scifi-helmet/SciFiHelmet.gltf",
-      "./src/assets/glb/BrainStem.glb",
+      "./src/assets/gltf/scifi-helmet/SciFiHelmet.gltf",
+      // "./src/assets/glb/BrainStem.glb",
       // "./assets/glb/FormalShoe.glb",
       // "./assets/gltf/toycar/ToyCar.gltf",
       // "./assets/gltf/duck/Duck.glb",
@@ -399,14 +310,6 @@ const app = {
     }
   },
 
-  addHighlightToObject: function (id) {
-    
-  },
-
-  removeHighlightFromObject: function (id) {
-    
-  },
-
   highlightObjectFromRaycaster: function () {
     // update the picking ray with the camera and pointer position
     viewer.rayCaster.setFromCamera(viewer.pointer, viewer.camera);
@@ -448,13 +351,15 @@ const app = {
     viewer.renderer.render(viewer.scene, viewer.camera);
   },
 
-  highlightObject: function(obj){
-    this.addHighlightToObject(obj.id);
-  },
-
+  /**
+   * adding event listener to raycast and highlight objects
+   */
   addEventListenerForHighlightObject: function(){
     window.addEventListener("mousemove", events.onPointerMove, false); //for raycaster
   },
+  /**
+   * remove event listener to highlight objects
+   */
   removeEventListenerForHighlightObject: function(){
     window.removeEventListener("mousemove", events.onPointerMove, false); //for raycaster
   },
@@ -463,9 +368,9 @@ const app = {
    * After completing the model or scene
    */
   afterSceneLoadComplete: function () {
-    app.homePosition();
-    app.getVerticesAndTrianglesCount();
-    app.getPartNames();
+    this.homePosition();
+    this.getVerticesAndTrianglesCount();
+    this.getPartNames();
   },
 };
 
