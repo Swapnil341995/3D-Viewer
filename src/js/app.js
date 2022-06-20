@@ -48,8 +48,8 @@ const app = {
     // Load a glTF and glb resource
     loader.load(
       // resource URL
-      "./src/assets/gltf/scifi-helmet/SciFiHelmet.gltf",
-      // "./src/assets/glb/BrainStem.glb",
+      // "./src/assets/gltf/scifi-helmet/SciFiHelmet.gltf",
+      "./src/assets/glb/BrainStem.glb",
       // "./assets/glb/FormalShoe.glb",
       // "./assets/gltf/toycar/ToyCar.gltf",
       // "./assets/gltf/duck/Duck.glb",
@@ -364,6 +364,33 @@ const app = {
     window.removeEventListener("mousemove", events.onPointerMove, false); //for raycaster
   },
 
+  addEventForPartSelect: function(){
+    window.addEventListener("mousedown", events.onSelectPart, false);
+  },
+
+  removeEventForPartSelect: function(){
+    window.removeEventListener("mousedown", events.onSelectPart, false);
+  },
+
+  updateParentVisbility: function(obj){
+    if(obj.type !== "Scene"){
+        obj.visible = true;
+        this.updateParentVisbility(obj.parent);
+    }
+  },
+
+  hideAllParts: function(){
+    viewer.sceneObject.traverse((obj) => {
+      obj.visible = false;
+    });
+  },
+
+  showAllParts: function(){
+    viewer.sceneObject.traverse((obj) => {
+      obj.visible = true;
+    });
+  },
+
   /**
    * After completing the model or scene
    */
@@ -392,6 +419,15 @@ const events = {
     app.highlightObjectFromRaycaster();
 
   },
+
+  onSelectPart: function(event){
+    if(app.INTERSECTED){
+      app.hideAllParts();
+      app.INTERSECTED.visible = true;
+      app.updateParentVisbility(app.INTERSECTED.parent);
+      app.removeEventForPartSelect();
+    }
+  }
 };
 
 function animate() {

@@ -13,6 +13,7 @@ const chkBoxTransformCont = document.getElementById("inp_chkTransCont");
 const chkBoxBbox = document.getElementById("inp_chkBbox");
 const ambLight = document.getElementById("inp_ambLight");
 const highlightObjects = document.getElementById("inp_highlightObject");
+const selectObjects = document.getElementById("inp_selectObject");
 
 function fillModelTree(){
     const divModelPart = document.getElementById("id_divModelTree");
@@ -55,11 +56,22 @@ function removeHighlightNameFromModelTree(id) {
     element.childNodes[0].style.color = "white";
 }
 
+selectObjects.onclick = function(){
+    if(selectObjects.checked){
+        app.addEventForPartSelect();
+    }else{
+        app.showAllParts();
+        app.removeEventForPartSelect();
+    }
+}
+
 highlightObjects.onclick = function(){
     if(highlightObjects.checked){
         app.addEventListenerForHighlightObject();
+        selectObjects.disabled = false;
     }else{
         app.removeEventListenerForHighlightObject();
+        selectObjects.disabled = true;
     }
 }
 
