@@ -89,9 +89,12 @@ chkBoxBbox.onclick = function(){
 
 chkBoxTransformCont.onclick = function(){
     if(chkBoxTransformCont.checked){
+        alert("W - Translation, E - Rotation, R - Scaling");
         app.addTransformControls();
+        window.addEventListener('keydown',events.onKeyDownForTransformControls, false);
     }else{
         app.removeTransformControls();
+        window.removeEventListener('keydown',events.onKeyDownForTransformControls, false);
     }
 }
 
