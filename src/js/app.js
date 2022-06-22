@@ -435,6 +435,23 @@ const events = {
       app.isPartSelected = true;
       app.removeEventForPartSelect();
     }
+  },
+
+  onKeyDownForTransformControls: function(event){
+    switch ( event.keyCode ) {
+
+      case 87: // W
+        app.transformControls.setMode( 'translate' );
+        break;
+
+      case 69: // E
+        app.transformControls.setMode( 'rotate' );
+        break;
+
+      case 82: // R
+        app.transformControls.setMode( 'scale' );
+        break;
+    }
   }
 };
 
