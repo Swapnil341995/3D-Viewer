@@ -33,6 +33,12 @@ function fillModelTree(){
             paraElement.style.color = "white";
             app.removeHighlight(paraElement.textContent);
         }
+        paraElement.onmousedown = function(){
+            if(selectObjects.checked){
+                const obj = viewer.sceneObject.getObjectByName(paraElement.textContent);
+                app.onModelTreeClickPart(obj);
+            }
+        }
         divElement.appendChild(paraElement);
         divModelPart.appendChild(divElement);
     });
@@ -58,8 +64,10 @@ function removeHighlightNameFromModelTree(id) {
 
 selectObjects.onclick = function(){
     if(selectObjects.checked){
+        alert("You have enabled TWO - WAY SELECTION !")
         app.addEventForPartSelect();
     }else{
+        app.isPartSelected = false;
         app.showAllParts();
         app.removeEventForPartSelect();
     }

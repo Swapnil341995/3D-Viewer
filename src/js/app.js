@@ -7,6 +7,7 @@ const app = {
   trianglesCount: null,
   transformControls: null,
   INTERSECTED: null,
+  isPartSelected: null,
   partNames: [],
   moveWings: false,
   createCube: function (length = 10,width = 10,height = 10,color = 0x0000ff) {
@@ -391,6 +392,12 @@ const app = {
     });
   },
 
+  onModelTreeClickPart: function(obj){
+    app.hideAllParts();
+    obj.visible = true;
+    app.updateParentVisbility(obj.parent);
+    app.isPartSelected = true;
+  },
   /**
    * After completing the model or scene
    */
@@ -421,10 +428,11 @@ const events = {
   },
 
   onSelectPart: function(event){
-    if(app.INTERSECTED){
+    if(!app.isPartSelected && app.INTERSECTED){
       app.hideAllParts();
       app.INTERSECTED.visible = true;
       app.updateParentVisbility(app.INTERSECTED.parent);
+      app.isPartSelected = true;
       app.removeEventForPartSelect();
     }
   }
