@@ -33,7 +33,7 @@ class Viewer {
         // this.far = 1000;
 
         this.renderer = new THREE.WebGLRenderer({canvas: this.canvas});
-        this.orbitControls = undefined;
+        this.controls = undefined;
         this.rayCaster = new THREE.Raycaster();
         this.pointer = new THREE.Vector2(); 
     }
