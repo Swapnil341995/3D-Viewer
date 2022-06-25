@@ -16,12 +16,32 @@ const app = {
     const cube = new THREE.Mesh(geometry, material);
     return cube;
   },
+
   addOrbitControls: function () {
-    viewer.orbitControls = new THREE.OrbitControls(
-      viewer.camera,
-      viewer.renderer.domElement
-    );
+    if(viewer.controls === undefined){
+      viewer.controls = new THREE.OrbitControls(
+        viewer.camera,
+        viewer.renderer.domElement
+      );
+    }
   },
+
+  addTrackballControls: function () {
+    if(viewer.controls === undefined){
+      viewer.controls = new THREE.TrackballControls(
+        viewer.camera,
+        viewer.renderer.domElement
+      );
+    }
+    viewer.controls.rotateSpeed = 5;
+  },
+
+  initializeControls: function(){
+    //starting the model viewer application with the orbit controls 
+    this.addOrbitControls()
+    // this.addTrackballControls();
+  },
+
   createTextureLoader: function () {
     const textureLoader = new THREE.TextureLoader();
     return textureLoader;
@@ -195,10 +215,10 @@ const app = {
       // let boundingBox = viewer.sceneObject.getBoundingBox();
       let minDist = viewer.camera.position.distanceTo(boundingBox.min);
       let minScaleFactor = minDist / 12;
-      viewer.orbitControls.minDistance = minScaleFactor;
+      viewer.controls.minDistance = minScaleFactor;
       let maxDist = viewer.camera.position.distanceTo(boundingBox.max);
       let maxScaleFactor = maxDist * 10;
-      viewer.orbitControls.maxDistance = maxScaleFactor;
+      viewer.controls.maxDistance = maxScaleFactor;
     }
   },
   getBoundingBoxCenter: function () {
@@ -210,9 +230,27 @@ const app = {
     );
     return bboxMaxCenter;
   },
-  updateOrbitControlsTarget: function () {
-    viewer.orbitControls.target = this.getBoundingBoxCenter();
+  updateControlsTarget: function () {
+    viewer.controls.target = this.getBoundingBoxCenter();
   },
+
+  changeControls: function(){
+    if(viewer.controls.enabled){
+      if(viewer.controls.type === "OrbitControls"){
+        viewer.controls.dispose();
+        viewer.controls = undefined;
+        this.addTrackballControls();
+        this.updateControlsTarget();
+      }
+      else if(viewer.controls.type === "TrackballControls"){
+        viewer.controls.dispose();
+        viewer.controls = undefined;
+        this.addOrbitControls();
+        this.updateControlsTarget();
+      }
+    }
+  },
+
   addTransformControls: function () {
     app.transformControls = new THREE.TransformControls(
       viewer.camera,
@@ -228,8 +266,8 @@ const app = {
   homePosition: function () {
     //calculate bounding box of the scene object
     const bbox = new THREE.Box3().setFromObject(viewer.sceneObject);
-    // //get the orbit controls target in the bounding box center
-    this.updateOrbitControlsTarget();
+    //get the orbit controls target in the bounding box center
+    this.updateControlsTarget();
     //generate matrix4 from the identity array
     const mat = new THREE.Matrix4().fromArray(app.identityMatrix);
     const inverse = new THREE.Matrix4();
@@ -457,8 +495,8 @@ const events = {
 
 function animate() {
   requestAnimationFrame(animate);
-  if (viewer.orbitControls) {
-    viewer.orbitControls.update();
+  if (viewer.controls) {
+    viewer.controls.update();
   }
   viewer.renderer.render(viewer.scene, viewer.camera);
 }
