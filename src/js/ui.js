@@ -14,6 +14,7 @@ const chkBoxBbox = document.getElementById("inp_chkBbox");
 const ambLight = document.getElementById("inp_ambLight");
 const highlightObjects = document.getElementById("inp_highlightObject");
 const selectObjects = document.getElementById("inp_selectObject");
+const selectDropdownCamera = document.getElementById("id_selectCamera");
 
 function fillModelTree(){
     const divModelPart = document.getElementById("id_divModelTree");
@@ -60,6 +61,12 @@ function removeHighlightNameFromModelTree(id) {
     // console.log(element);
     element.style.backgroundColor = "black";
     element.childNodes[0].style.color = "white";
+}
+
+selectDropdownCamera.onchange = function(){
+    if(selectDropdownCamera.value){
+        viewer.toggleCameraView();
+    }
 }
 
 selectObjects.onclick = function(){

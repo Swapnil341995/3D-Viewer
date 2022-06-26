@@ -32,8 +32,6 @@
 			// API
 
 			this.enabled = true;
-			//To check which controls
-			this.type = 'TrackballControls'	//Added for development purpose-swapnil
 			this.screen = {
 				left: 0,
 				top: 0,

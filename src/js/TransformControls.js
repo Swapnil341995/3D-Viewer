@@ -258,7 +258,7 @@
 
 				//swapnil
 				if(viewer.sceneObject){
-					viewer.orbitControls.enabled = false;
+					viewer.controls.enabled = false;
 				}
 
 			}
@@ -519,7 +519,7 @@
 				
 				//swapnil
 				if(viewer.sceneObject){
-					viewer.orbitControls.enabled = true;
+					viewer.controls.enabled = true;
 				}
 
 			}
