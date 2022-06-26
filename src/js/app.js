@@ -230,6 +230,7 @@ const app = {
     );
     return bboxMaxCenter;
   },
+
   updateControlsTarget: function () {
     viewer.controls.target = this.getBoundingBoxCenter();
   },
@@ -259,6 +260,7 @@ const app = {
     app.transformControls.attach(viewer.sceneObject);
     viewer.scene.add(app.transformControls);
   },
+
   removeTransformControls: function () {
     app.transformControls.detach();
   },
@@ -451,6 +453,12 @@ const events = {
     const width = window.innerWidth;
     const height = window.innerHeight;
     viewer.camera.aspect = width / height;
+    if(viewer.camera instanceof THREE.OrthographicCamera){
+      viewer.camera.left = window.innerWidth / -2;
+      viewer.camera.right = window.innerWidth / 2;
+      viewer.camera.bottom = window.innerHeight / -2;
+      viewer.camera.top = window.innerHeight / 2;
+    }
     viewer.renderer.setSize(width, height);
     viewer.camera.updateProjectionMatrix();
   },

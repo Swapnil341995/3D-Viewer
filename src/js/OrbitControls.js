@@ -27,9 +27,6 @@
 			this.domElement = domElement;
 			this.domElement.style.touchAction = 'none'; // disable touch scroll
 
-			//To check which controls
-			this.type = 'OrbitControls'	//Added for development purpose-swapnil
-
 			// Set to false to disable this control
 			this.enabled = true; // "target" sets the location of focus, where the object orbits around
 
