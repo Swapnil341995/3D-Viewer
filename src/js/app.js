@@ -438,6 +438,16 @@ const app = {
     app.updateParentVisbility(obj.parent);
     app.isPartSelected = true;
   },
+
+  getScreenshot(){
+    animate();
+    const dataURL = viewer.canvas.toDataURL();
+    const lnk = document.createElement('a');
+    lnk.href = dataURL;
+    lnk.download = 'screenshot';
+    lnk.click();
+  },
+
   /**
    * After completing the model or scene
    */
