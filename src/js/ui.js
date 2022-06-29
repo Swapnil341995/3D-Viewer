@@ -15,6 +15,16 @@ const ambLight = document.getElementById("inp_ambLight");
 const highlightObjects = document.getElementById("inp_highlightObject");
 const selectObjects = document.getElementById("inp_selectObject");
 const selectDropdownCamera = document.getElementById("id_selectCamera");
+const chkBoxRotateObj = document.getElementById("inp_rotateObj");
+
+chkBoxRotateObj.onclick = function(){
+    if(chkBoxRotateObj.checked){
+        app.rotateSceneObj = true;
+    }
+    else{
+        app.rotateSceneObj = false
+    }
+}
 
 function fillModelTree(){
     const divModelPart = document.getElementById("id_divModelTree");

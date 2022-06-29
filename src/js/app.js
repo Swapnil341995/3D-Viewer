@@ -10,6 +10,7 @@ const app = {
   isPartSelected: null,
   partNames: [],
   moveWings: false,
+  rotateSceneObj: true,
   createCube: function (length = 10,width = 10,height = 10,color = 0x0000ff) {
     const geometry = new THREE.BoxGeometry(length, width, height);
     const material = new THREE.MeshBasicMaterial({ color: color });
@@ -448,6 +449,14 @@ const app = {
     lnk.click();
   },
 
+  rotateSceneObject: function(bool_value){
+    if(bool_value){
+      viewer.sceneObject.rotation.y += 0.005;
+    }else{
+      viewer.sceneObject.rotation.y += 0;
+    }
+  },
+
   /**
    * After completing the model or scene
    */
@@ -515,6 +524,9 @@ function animate() {
   requestAnimationFrame(animate);
   if (viewer.controls) {
     viewer.controls.update();
+  }
+  if(app.rotateSceneObj){
+    app.rotateSceneObject(app.rotateSceneObj);
   }
   viewer.renderer.render(viewer.scene, viewer.camera);
 }
