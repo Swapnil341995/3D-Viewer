@@ -47,6 +47,7 @@ const app = {
     const textureLoader = new THREE.TextureLoader();
     return textureLoader;
   },
+
   addDefaultMaterialProperties: function () {
     const loader = this.createTextureLoader();
     const texture = loader.load(
@@ -60,11 +61,13 @@ const app = {
     };
     return defaultMaterial;
   },
+
   moveMeshPosition: function (mesh, objPositions) {
     mesh.position.x = objPositions.x;
     mesh.position.y = objPositions.y;
     mesh.position.z = objPositions.z;
   },
+
   loadGltf: function () {
     const loader = new THREE.GLTFLoader();
     // Load a glTF and glb resource
@@ -96,6 +99,7 @@ const app = {
       }
     );
   },
+
   loadOBJ: function () {
     const loader = new THREE.OBJLoader();
     loader.load(
@@ -118,6 +122,7 @@ const app = {
       }
     );
   },
+  
   addOrUpdateAmbientLight: function (intensity = 0.5) {
     const ambLight = viewer.scene.getObjectByName("ambient_light");
     if(ambLight === undefined){
@@ -130,11 +135,13 @@ const app = {
       ambLight.intensity = intensity;
     }
   },
+
   addSpotLight: function () {
     const light = new THREE.SpotLight(0x404040);
     light.intensity = 2;
     return light;
   },
+
   addSpotLightInCamera: function () {
     const spotLight = this.addSpotLight();
     spotLight.position.set(0, 0, 1);
@@ -142,6 +149,7 @@ const app = {
     viewer.camera.add(spotLight);
     viewer.camera.updateProjectionMatrix();
   },
+
   showOrHideBoundingBox: function (boolBbox) {
     let box;
     if (boolBbox) {
@@ -153,6 +161,7 @@ const app = {
       viewer.scene.remove(box);
     }
   },
+
   /**
    *
    * @param {3d object or mesh or group} object
@@ -192,6 +201,7 @@ const app = {
     });
     return bbox;
   },
+
   getDimensions: function () {
     let bbox = this.getProperBbox(viewer.sceneObject);
     let dim_x = bbox.max.x - bbox.min.x;
@@ -199,6 +209,7 @@ const app = {
     let dim_z = bbox.max.z - bbox.min.z;
     return { dim_x, dim_y, dim_z };
   },
+
   alignCameraWithBbox: function () {
     const bbox = this.getProperBbox(viewer.sceneObject);
     // const vect = new THREE.Vector3();
@@ -210,6 +221,7 @@ const app = {
     viewer.camera.lookAt(viewer.sceneObject);
     viewer.camera.updateProjectionMatrix();
   },
+  
   setPerspectiveCameraZoomLimit: function () {
     if (viewer.sceneObject) {
       let boundingBox = new THREE.Box3().setFromObject(viewer.sceneObject);
@@ -222,6 +234,7 @@ const app = {
       viewer.controls.maxDistance = maxScaleFactor;
     }
   },
+
   getBoundingBoxCenter: function () {
     let bbox = new THREE.Box3().setFromObject(viewer.sceneObject);
     let bboxMaxCenter = new THREE.Vector3(
@@ -269,7 +282,7 @@ const app = {
   homePosition: function () {
     //calculate bounding box of the scene object
     const bbox = new THREE.Box3().setFromObject(viewer.sceneObject);
-    //get the orbit controls target in the bounding box center
+    //get the controls target in the bounding box center
     this.updateControlsTarget();
     //generate matrix4 from the identity array
     const mat = new THREE.Matrix4().fromArray(app.identityMatrix);
@@ -399,6 +412,7 @@ const app = {
   addEventListenerForHighlightObject: function(){
     window.addEventListener("mousemove", events.onPointerMove, false); //for raycaster
   },
+
   /**
    * remove event listener to highlight objects
    */
@@ -464,7 +478,7 @@ const app = {
     this.homePosition();
     this.getVerticesAndTrianglesCount();
     this.getPartNames();
-  },
+  }
 };
 
 const events = {
