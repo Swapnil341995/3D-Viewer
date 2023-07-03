@@ -10,7 +10,7 @@ const app = {
   isPartSelected: null,
   partNames: [],
   moveWings: false,
-  rotateSceneObj: true,
+  rotateSceneObj: false,
   createCube: function (length = 10,width = 10,height = 10,color = 0x0000ff) {
     const geometry = new THREE.BoxGeometry(length, width, height);
     const material = new THREE.MeshBasicMaterial({ color: color });
@@ -73,8 +73,8 @@ const app = {
     // Load a glTF and glb resource
     loader.load(
       // resource URL
-      // "./src/assets/gltf/scifi-helmet/SciFiHelmet.gltf",
-      "./src/assets/glb/BrainStem.glb",
+      "./src/assets/gltf/scifi-helmet/SciFiHelmet.gltf",
+      // "./src/assets/glb/BrainStem.glb",
       // "./assets/glb/FormalShoe.glb",
       // "./assets/gltf/toycar/ToyCar.gltf",
       // "./assets/gltf/duck/Duck.glb",
@@ -83,7 +83,8 @@ const app = {
       function (gltf) {
         viewer.sceneObject.add(gltf.scene);
         app.afterSceneLoadComplete();
-        // gltf.animations; // Array<THREE.AnimationClip>
+        gltf.animations; // Array<THREE.AnimationClip>
+        console.log(gltf.animations);
         // gltf.scene; // THREE.Group
         // gltf.scenes; // Array<THREE.Group>
         // gltf.cameras; // Array<THREE.Camera>
@@ -541,6 +542,9 @@ function animate() {
   }
   if(app.rotateSceneObj){
     app.rotateSceneObject(app.rotateSceneObj);
+  }
+  if(viewer.axisTriadRenderer){
+    viewer.axisTriadRenderer.render(viewer.axisTriadScene, viewer.axisTriadCamera);
   }
   viewer.renderer.render(viewer.scene, viewer.camera);
 }
