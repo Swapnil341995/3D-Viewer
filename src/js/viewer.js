@@ -101,6 +101,7 @@ class Viewer {
         for(let i = 0;i < this.scene.children.length;++i){
             if(this.scene.children[i].name === "perspective camera"){
                 this.scene.remove(this.scene.children[i]);
+                break;//optimizing
             }
         }
     }
