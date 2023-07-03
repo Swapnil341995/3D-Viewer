@@ -83,7 +83,7 @@ class Viewer {
             this.far
         )
         this.camera.name = "orthographic camera";
-        this.camera.zoom = 150;
+        this.camera.zoom = 55;
         app.addSpotLightInCamera();
         viewer.scene.add(this.camera);
         this.camera.updateProjectionMatrix();
@@ -93,6 +93,7 @@ class Viewer {
         for(let i = 0;i < this.scene.children.length;++i){
             if(this.scene.children[i].name === "orthographic camera"){
                 this.scene.remove(this.scene.children[i]);
+                break;//optimize
             }
         }
     }
