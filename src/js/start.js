@@ -3,6 +3,7 @@ const start = {
         viewer.setSceneBackgroundColor(0xf5f5f5);
         window.addEventListener('resize', events.onWindowResize, false);
         viewer.renderer.setSize(window.innerWidth, window.innerHeight);
+        viewer.renderer.setPixelRatio( window.devicePixelRatio);
         document.body.appendChild(viewer.renderer.domElement);
         viewer.initializePerspectiveCamera();
         viewer.scene.add(viewer.camera);
