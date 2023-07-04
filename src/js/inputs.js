@@ -1,7 +1,7 @@
 // const viewer = new Viewer();
 // viewer.scene.add(viewer.camera);
 // const sceneObject = viewer.scene.children[0]; 
-viewer.setSceneBackgroundColor(0xf5f5f5);
+// viewer.setSceneBackgroundColor(0xf5f5f5);//already present in start.js
 window.addEventListener('resize', events.onWindowResize, false);
 viewer.renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(viewer.renderer.domElement);
